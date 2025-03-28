@@ -8,28 +8,57 @@
 import UIKit
 
 class ViewController: UIViewController {
-
-    lazy private var sampleLabel: UILabel = {
-            let label = UILabel()
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.text = "Hello World!"
-            label.textColor = UIColor.black
-            return label
-        }()
+    
+    private(set) lazy var navigationBar: UINavigationBar = {
+        let navigationBar = UINavigationBar()
+        let navigationItem = UINavigationItem()
+        navigationItem.title = "City Name"
+        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), imageResourse: .burgerSvg, withsize: CGSize(width: 34, height: 18))
+        navigationItem.rightBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentLocationSettings), imageResourse: .locationSvg, withsize: CGSize(width: 20, height: 26))
+        navigationBar.tintColor = .black
+        navigationBar.barTintColor = .systemBackground
+        navigationBar.setItems([navigationItem], animated: false)
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
+        return navigationBar
+    }()
 
         override func viewDidLoad() {
             super.viewDidLoad()
-            self.view.backgroundColor = UIColor.white
-            self.view.addSubview(self.sampleLabel)
+            view.backgroundColor = UIColor.systemBackground
+            view.addSubview(navigationBar)
             self.setUpConstraints()
         }
 
         func setUpConstraints() {
-            let sampleLabelConstraints = [
-                self.sampleLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-                self.sampleLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor)
+            let navigationBarConstraints = [
+                navigationBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+                navigationBar.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
             ]
-            NSLayoutConstraint.activate(sampleLabelConstraints)
+            NSLayoutConstraint.activate(navigationBarConstraints)
         }
+    
+    @objc func presentSettings() {
+        
+    }  
+    
+    @objc func presentLocationSettings() {
+        
+    }
 }
 
+extension UIBarButtonItem {
+
+    static func menuButton(_ target: Any?, action: Selector, imageResourse: ImageResource, withsize: CGSize) -> UIBarButtonItem {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(resource: imageResourse), for: .normal)
+        button.addTarget(target, action: action, for: .touchUpInside)
+
+        let menuBarItem = UIBarButtonItem(customView: button)
+        menuBarItem.customView?.translatesAutoresizingMaskIntoConstraints = false
+        menuBarItem.customView?.heightAnchor.constraint(equalToConstant: withsize.height).isActive = true
+        menuBarItem.customView?.widthAnchor.constraint(equalToConstant: withsize.width).isActive = true
+
+        return menuBarItem
+    }
+}
