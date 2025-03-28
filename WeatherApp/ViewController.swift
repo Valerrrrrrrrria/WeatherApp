@@ -17,6 +17,7 @@ class ViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentLocationSettings), imageResourse: .locationSvg, withsize: CGSize(width: 20, height: 26))
         navigationBar.tintColor = .black
         navigationBar.barTintColor = .systemBackground
+        navigationBar.shadowImage = UIImage()
         navigationBar.setItems([navigationItem], animated: false)
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         return navigationBar
