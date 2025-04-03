@@ -9,6 +9,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    private let scroolView = UIScrollView()
+    
     private(set) lazy var navigationBar: UINavigationBar = {
         let navigationBar = UINavigationBar()
         let navigationItem = UINavigationItem()
@@ -22,13 +24,31 @@ class ViewController: UIViewController {
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         return navigationBar
     }()
+    
+    private(set) lazy var pageControl: UIPageControl = {
+        let pageControl = UIPageControl()
+        pageControl.numberOfPages = 5
+        pageControl.backgroundColor = .cyan
+        pageControl.addTarget(self, action: #selector(pageControlDidChange(_:)), for: .valueChanged)
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        return pageControl
+    }()
 
         override func viewDidLoad() {
             super.viewDidLoad()
+            scroolView.delegate = self
             view.backgroundColor = UIColor.systemBackground
             view.addSubview(navigationBar)
-            self.setUpConstraints()
+            view.addSubview(pageControl)
+            view.addSubview(scroolView)
+            setUpConstraints()
         }
+    
+    override func viewDidLayoutSubviews() {
+        if scroolView.subviews.count == 2 {
+            configureScroolView()
+        }
+    }
 
         func setUpConstraints() {
             let navigationBarConstraints = [
@@ -37,7 +57,48 @@ class ViewController: UIViewController {
                 navigationBar.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
             ]
             NSLayoutConstraint.activate(navigationBarConstraints)
+            
+            let pageControlConstraints = [
+                pageControl.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 0),
+                pageControl.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                pageControl.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            ]
+            NSLayoutConstraint.activate(pageControlConstraints)
+            
+            scroolView.backgroundColor = .darkGray
+            scroolView.translatesAutoresizingMaskIntoConstraints = false
+            let scroolViewConstraints = [
+                scroolView.topAnchor.constraint(equalTo: pageControl.bottomAnchor),
+                scroolView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+                scroolView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+                scroolView.heightAnchor.constraint(equalToConstant: 300)
+            ]
+            NSLayoutConstraint.activate(scroolViewConstraints)
         }
+    
+    @objc func pageControlDidChange(_ sender: UIPageControl) {
+        let current = sender.currentPage
+        scroolView.setContentOffset(CGPoint(x: CGFloat(current) * view.frame.width, y: 0 ), animated: true)
+    }
+    
+    func configureScroolView() {
+        scroolView.contentSize = CGSize(width: view.frame.width * 5, height: scroolView.frame.height)
+        scroolView.isPagingEnabled = true
+        
+        let colors: [UIColor] = [
+            .red,
+            .black,
+            .blue,
+            .cyan,
+            .green
+        ]
+        
+        for i in 0..<5 {
+            let page = UIView(frame: CGRect(x: CGFloat(i) * view.frame.width, y: 0, width: view.frame.width, height: scroolView.frame.height))
+            page.backgroundColor = colors[i]
+            scroolView.addSubview(page)
+        }
+    }
     
     @objc func presentSettings() {
         
@@ -49,7 +110,6 @@ class ViewController: UIViewController {
 }
 
 extension UIBarButtonItem {
-
     static func menuButton(_ target: Any?, action: Selector, imageResourse: ImageResource, withsize: CGSize) -> UIBarButtonItem {
         let button = UIButton(type: .system)
         button.setImage(UIImage(resource: imageResourse), for: .normal)
@@ -61,5 +121,11 @@ extension UIBarButtonItem {
         menuBarItem.customView?.widthAnchor.constraint(equalToConstant: withsize.width).isActive = true
 
         return menuBarItem
+    }
+}
+
+extension ViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        pageControl.currentPage = Int(floorf(Float(scroolView.contentOffset.x) / Float(scroolView.frame.width)))
     }
 }
