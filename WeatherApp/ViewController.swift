@@ -105,7 +105,9 @@ class ViewController: UIViewController {
     }  
     
     @objc func presentLocationSettings() {
-        
+        let onboardingViewController = OnboardingViewController()
+        onboardingViewController.modalPresentationStyle = .fullScreen
+        present(onboardingViewController, animated: false)
     }
 }
 
